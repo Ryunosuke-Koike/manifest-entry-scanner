@@ -46,7 +46,7 @@
 
 ## 2026-08-21: マニフェスト登録スキャナーの実装用プロジェクト生成
 
-- Goal・タスク・Issue・PR: T-001〜T-003、T-005〜T-007、GitHub Issue #1
+- Goal・タスク・Issue・PR: T-001〜T-003、T-005〜T-007、GitHub Issue #1、ドラフトPR #2
 - 作業者または担当役: 要件整理・統括エージェント
 - 作業開始時の状態: スターターの基準コミット `5af1eef` を `origin/main` へプッシュ済み。アプリ要件は未記入
 - 実施内容: 詳細Grill-meで要件を確定し、`generated-projects/manifest-entry-scanner/` に要件、Goal、タスク、技術構成、スプレッドシート構造、ソース・テスト初期ツリー、実装起動スキルを生成
@@ -56,3 +56,4 @@
 - 対応内容: 削除と追加を別パッチへ分離した。検証条件を実際のルール文言へ合わせ、生成物自体の不足と検証コードの誤りを区別した
 - 次回への改善: 全文置換は最初から削除・追加を別操作にし、ルール検証は複数の重要語と成果物の組み合わせで判定する
 - 更新した計画・タスク・手順: `PROJECT_BRIEF.md`、`plans/MASTER_PLAN.md`、`tasks/TASKS.md`、`decisions/DECISION_LOG.md`、生成プロジェクト一式
+- Git結果: コミット `d2b98b0` を `feature/1-manifest-entry-scanner-plan` へプッシュし、`https://github.com/Ryunosuke-Koike/manifest-entry-scanner/pull/2` をドラフトで作成。人のレビューとマージ判断待ち
