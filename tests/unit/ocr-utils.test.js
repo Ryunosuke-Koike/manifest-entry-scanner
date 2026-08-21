@@ -1,0 +1,17 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const source = fs.readFileSync(path.join(__dirname, '../../src/client/ocr-utils.html'), 'utf8');
+const context = { window: {} };
+vm.runInNewContext(source.replace(/<script>|<\/script>/g, ''), context);
+const ocr = context.window.ManifestScannerOcr;
+assert.deepEqual(Array.from(ocr.ticketTypes), ['A', 'B1', 'B2', 'C1', 'C2', 'D', 'E']);
+assert.equal(ocr.extractManifestNumber('番号：１２３４５６７８９０１'), '12345678901');
+assert.equal(ocr.extractManifestNumber('12O45I78901'), '12045178901');
+assert.equal(ocr.extractTicketType('票種 B1'), 'B1');
+assert.equal(ocr.extractTicketType('type C2'), 'C2');
+assert.equal(ocr.extractTicketType('MANIFEST'), '');
+assert.equal(ocr.isHighConfidence(80, 80), true);
+assert.equal(ocr.isHighConfidence(79.9, 80), false);
+console.log('OCR utility tests passed');
