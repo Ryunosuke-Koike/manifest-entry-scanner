@@ -34,6 +34,18 @@
 
 7. 人が作成したリモートURLを提示し、接続確認後に実装を始める
 
+## 次のプロジェクトを始める
+
+前の案件をコピーし、実装用リポジトリへの保存とPRレビューが完了した後、次の独立した指示を入力します。
+
+```text
+初期状態に戻す
+```
+
+初期化機能は、Git同期、作業ブランチ、コピー先の全ファイル一致を事前検査します。人が確認文字列を承認した場合だけ、案件固有の要件・計画・タスク・判断を初期状態へ戻します。生成物は削除せず `archives/generated-projects/` へ退避し、スキル、運用ルール、開発ログ、Git履歴を維持します。
+
+初期化結果をコミット・プッシュし、人がPRをレビュー・マージした後、次の `開発スタート` を使用します。
+
 ## 主なファイル
 
 - `AGENTS.md`: リポジトリ全体の作業ルール
@@ -44,11 +56,13 @@
 - `docs/DEVELOPMENT_WORKFLOW.md`: 計画から実装までの手順
 - `docs/GENERATED_PROJECT_SPEC.md`: コピー可能な実装用プロジェクトの生成仕様
 - `docs/GIT_WORKFLOW.md`: Git、Issue、ブランチ、PRの運用
+- `docs/REPOSITORY_BOUNDARIES.md`: スターターと各アプリのリポジトリ分離ルール
 - `logs/DEVELOPMENT_LOG.md`: 作業結果、失敗、改善策の記録
 - `docs/TECHNOLOGY_EXPLANATION_TEMPLATE.md`: 技術説明の書式
 - `reviews/`: レビュー結果
 - `.codex/skills/app-dev-orchestrator/SKILL.md`: 開発統括スキル
 - `.codex/skills/grill-me-lite/SKILL.md`: 初心者向け質問スキル
+- `.codex/skills/reset-project-state/SKILL.md`: 案件固有状態だけを安全に初期化するスキル
 - `.codex/skills/start-app-development/assets/project-template/`: 生成する実装用プロジェクトの共通雛形
 - `generated-projects/`: 要件確定後の実装用プロジェクト出力先
 
