@@ -1,0 +1,4 @@
+interface:
+  display_name: "案件状態を安全に初期化"
+  short_description: "スターター機能と学習ログを維持して案件固有状態だけを初期化"
+  default_prompt: "案件状態を安全に初期化してください"
