@@ -1,0 +1,16 @@
+# 秘密情報
+.env
+.env.local
+*.key
+
+# 依存関係と生成物
+node_modules/
+dist/
+build/
+coverage/
+
+# OS・エディタ
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
