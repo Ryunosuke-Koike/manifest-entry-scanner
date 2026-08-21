@@ -12,4 +12,4 @@ Goal 1で、次の画面とブラウザ処理を小さく実装します。
 
 撮影画像、Blob、Canvas、Data URLをサーバーへ送信してはいけません。Tesseract.jsのバージョンと読み込み先は実装時に固定し、起動時に1回だけWorkerを準備します。
 
-このディレクトリは初期ツリーだけで、アプリ機能は未実装です。
+`index.html`、`styles.html`、`app.html`、`ocr-utils.html` がGoal 1の試作画面です。`app.html`はCanvasで取得した画像をTesseract.jsへ渡しますが、Apps Scriptのサーバー関数へ渡すペイロードには画像を含めません。

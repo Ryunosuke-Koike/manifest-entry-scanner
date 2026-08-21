@@ -1,0 +1,46 @@
+<script>
+(function() {
+  'use strict';
+  var state = { stream: null, worker: null, threshold: 80, sessionId: 'session-' + Date.now(), lastResult: null };
+  var $ = function(id) { return document.getElementById(id); };
+  var api = window.ManifestScannerOcr;
+  document.addEventListener('DOMContentLoaded', function() {
+    fillTicketTypes_($('ticket-type')); fillTicketTypes_($('manual-ticket-type'));
+    $('start-camera').addEventListener('click', startCamera_); $('capture').addEventListener('click', captureAndRecognize_); $('retry').addEventListener('click', resetResult_); $('register').addEventListener('click', function() { register_('自動認識'); }); $('manual-register').addEventListener('click', registerManual_); loadSession_();
+  });
+  function fillTicketTypes_(select) { select.innerHTML = '<option value="">選択してください</option>'; api.ticketTypes.forEach(function(type) { var option = document.createElement('option'); option.value = type; option.textContent = type; select.appendChild(option); }); }
+  function loadSession_() {
+    if (!window.google || !google.script || !google.script.run) { setMessage_('Apps Script上で開くと検証を開始できます。', 'error'); return; }
+    google.script.run.withSuccessHandler(function(config) { state.threshold = config.confidenceThreshold || 80; setDiagnostics_({ threshold: state.threshold, spreadsheetConfigured: config.spreadsheetConfigured, sessionId: state.sessionId }); initializeWorker_(); }).withFailureHandler(function() { setMessage_('設定を読み込めません。管理者へ確認してください。', 'error'); }).getAppConfig();
+    google.script.run.withSuccessHandler(function(info) { $('account').textContent = info.email ? 'Googleアカウント: ' + info.email : 'Googleアカウントを取得できません。'; $('auth-status').textContent = info.authenticated ? '認証済み' : '要確認'; $('auth-status').className = 'status-chip ' + (info.authenticated ? 'success' : 'error'); }).getSessionInfo();
+    google.script.run.withSuccessHandler(function(operators) { var select = $('operator'); select.innerHTML = '<option value="">選択してください</option>'; operators.forEach(function(operator) { var option = document.createElement('option'); option.value = operator.name; option.textContent = operator.name; select.appendChild(option); }); }).withFailureHandler(function() { $('operator').innerHTML = '<option value="">管理者設定待ち</option>'; }).listOperators();
+  }
+  function initializeWorker_() {
+    if (!window.Tesseract) { setMessage_('OCRライブラリを読み込めません。通信状態を確認してください。', 'error'); return; }
+    $('ocr-status').textContent = 'OCR準備中';
+    Tesseract.createWorker('eng', 1, { logger: function(message) { if (message.status === 'recognizing text') $('ocr-status').textContent = 'OCR ' + Math.round(message.progress * 100) + '%'; } }).then(function(worker) { state.worker = worker; $('ocr-status').textContent = 'OCR準備完了'; $('ocr-status').className = 'status-chip success'; }).catch(function() { $('ocr-status').textContent = 'OCR準備失敗'; $('ocr-status').className = 'status-chip error'; });
+  }
+  function startCamera_() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { setMessage_('このブラウザはカメラ撮影に対応していません。', 'error'); return; }
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false }).then(function(stream) { state.stream = stream; $('camera').srcObject = stream; $('capture').disabled = false; $('start-camera').textContent = 'カメラ起動済み'; setMessage_('撮影枠に合わせて撮影してください。', ''); }).catch(function() { setMessage_('カメラを起動できません。権限とHTTPS接続を確認してください。', 'error'); });
+  }
+  function captureAndRecognize_() {
+    if (!state.worker) { setMessage_('OCR準備中です。少し待ってください。', 'error'); return; }
+    var video = $('camera'); var canvas = $('capture-canvas'); if (!video.videoWidth) { setMessage_('カメラ映像が準備できていません。', 'error'); return; }
+    var startedAt = performance.now(); var sx = Math.round(video.videoWidth * 0.08); var sy = Math.round(video.videoHeight * 0.12); var sw = Math.round(video.videoWidth * 0.84); var sh = Math.round(video.videoHeight * 0.76); canvas.width = sw; canvas.height = sh; canvas.getContext('2d').drawImage(video, sx, sy, sw, sh, 0, 0, sw, sh); var localImage = canvas.toDataURL('image/jpeg', 0.85); setMessage_('端末内で読み取り中…', ''); $('capture').disabled = true;
+    state.worker.recognize(localImage).then(function(result) { var text = result.data.text || ''; var confidence = Number(result.data.confidence || 0); state.lastResult = { number: api.extractManifestNumber(text), ticket: api.extractTicketType(text), confidence: confidence, processingTimeMs: Math.round(performance.now() - startedAt) }; renderResult_(); }).catch(function() { setMessage_('読み取りに失敗しました。手入力または撮り直しを選択してください。', 'error'); }).finally(function() { localImage = ''; canvas.width = 1; canvas.height = 1; $('capture').disabled = false; });
+  }
+  function renderResult_() { var result = state.lastResult; $('result-panel').hidden = false; $('manifest-number').value = result.number; $('ticket-type').value = result.ticket || ''; var high = api.isHighConfidence(result.confidence, state.threshold); $('confidence').textContent = '確信度 ' + Math.round(result.confidence) + '%'; $('confidence').className = 'status-chip ' + (high ? 'success' : 'warn'); $('result-message').textContent = high ? '候補を確認して登録してください。' : '確信度が低いため、内容を修正するか撮り直してください。'; }
+  function resetResult_() { state.lastResult = null; $('result-panel').hidden = true; setMessage_('撮り直してください。', ''); }
+  function registerManual_() { registerPayload_($('manual-number').value, $('manual-ticket-type').value, '手入力', 0, 0); }
+  function register_(method) { var result = state.lastResult || {}; registerPayload_($('manifest-number').value, $('ticket-type').value, method, result.confidence || 0, result.processingTimeMs || 0); }
+  function registerPayload_(number, ticket, method, confidence, processingTimeMs) {
+    var operator = $('operator').value; if (!operator) { setMessage_('担当者を選択してください。', 'error'); return; }
+    var payload = { manifestNumber: number, ticketType: ticket, readingMethod: method, ocrConfidence: confidence, processingTimeMs: processingTimeMs, sessionId: state.sessionId, operatorName: operator, deviceType: navigator.userAgentData && navigator.userAgentData.platform || navigator.platform || 'unknown', browserType: navigator.userAgent };
+    if (!window.google || !google.script || !google.script.run) { setMessage_('Apps Script上で登録できます。', 'error'); return; }
+    setMessage_('登録中…', ''); google.script.run.withSuccessHandler(function(response) { if (response.duplicate) { setMessage_('同じ番号と票種が登録済みです。', 'error'); return; } if (response.ok) { setMessage_('登録しました。次の伝票へ進めます。', 'success'); $('result-panel').hidden = true; $('manual-number').value = ''; state.lastResult = null; } }).withFailureHandler(function() { setMessage_('登録に失敗しました。同じ伝票で再試行してください。', 'error'); }).registerReading(payload);
+  }
+  function setMessage_(message, type) { var element = $('message'); element.textContent = message; element.className = 'message ' + (type || ''); }
+  function setDiagnostics_(value) { $('diagnostics-output').textContent = JSON.stringify(value, null, 2); }
+})();
+</script>

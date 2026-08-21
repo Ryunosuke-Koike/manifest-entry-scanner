@@ -1,0 +1,11 @@
+<script>
+(function(global) {
+  'use strict';
+  var TYPES = ['A', 'B1', 'B2', 'C1', 'C2', 'D', 'E'];
+  function normalizeOcrText(value) { return String(value || '').toUpperCase().replace(/[０-９]/g, function(char) { return String.fromCharCode(char.charCodeAt(0) - 0xfee0); }).replace(/[ＯΟ]/g, '0').replace(/[ＩＩＬｌ]/g, '1'); }
+  function extractManifestNumber(value) { var text = normalizeOcrText(value).replace(/[OQ]/g, '0').replace(/[IL]/g, '1'); var match = text.match(/\d{11}/); return match ? match[0] : ''; }
+  function extractTicketType(value) { var text = normalizeOcrText(value); var tokens = text.split(/[^A-Z0-9]+/).filter(Boolean); for (var i = 0; i < TYPES.length; i += 1) { if (tokens.indexOf(TYPES[i]) >= 0) return TYPES[i]; } var match = text.match(/(?:^|[^A-Z0-9])(B1|B2|C1|C2|A|D|E)(?:[^A-Z0-9]|$)/); return match ? match[1] : ''; }
+  function isHighConfidence(confidence, threshold) { return Number(confidence) >= Number(threshold || 80); }
+  global.ManifestScannerOcr = { ticketTypes: TYPES.slice(), normalizeOcrText: normalizeOcrText, extractManifestNumber: extractManifestNumber, extractTicketType: extractTicketType, isHighConfidence: isHighConfidence };
+})(window);
+</script>

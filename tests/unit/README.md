@@ -10,4 +10,8 @@ Goal 1の実装時に、純粋なJavaScriptとして分離した次の処理を�
 - 30分のセッション判定
 - スプレッドシート行への変換
 
-テストランナーと実行コマンドは実装開始後に比較・固定し、実際に動作確認してから `docs/TESTING.md` へ記載します。
+OCR文字列の正規化と候補制限はNode.js標準のテストランナーで確認します。
+
+```text
+node --test tests/unit/ocr-utils.test.js
+```

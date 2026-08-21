@@ -16,10 +16,10 @@
 | G1-002 | BLOCKED | Product Agent | 会社ルール上の保存期間を確認する | 保存期間と削除担当が記録される |
 | G1-003 | BLOCKED | Product Agent | 7票種の見本画像を受領・確認する | 各票種の番号・票種位置と画像の扱いが確認される |
 | G1-004 | DONE | Builder Agent | Gitと確認済みリモートを準備する | 初回コミットがプッシュされる |
-| G1-005 | TODO | Lead Agent | Goal 1のIssueと作業ブランチを作る | 日本語Issueと対応ブランチがある |
-| G1-006 | TODO | Builder Agent | Apps Scriptとローカル開発環境を初期化する | 安全な設定例とデプロイ手順がある |
-| G1-007 | TODO | Builder Agent | iPhone・Androidのカメラ成立性を検証する | 両端末で撮影でき、結果が記録される |
-| G1-008 | TODO | Builder Agent | Tesseract.jsの端末内OCR試作を作る | 画像を送信せず11桁番号と票種候補を取得できる |
+| G1-005 | DONE | Lead Agent | Goal 1のIssueと作業ブランチを作る | 日本語Issueと対応ブランチがある |
+| G1-006 | DONE | Builder Agent | Apps Scriptとローカル開発環境を初期化する | 安全な設定例とデプロイ手順がある |
+| G1-007 | BLOCKED | Builder Agent | iPhone・Androidのカメラ成立性を検証する | 両端末で撮影でき、結果が記録される |
+| G1-008 | DOING | Builder Agent | Tesseract.jsの端末内OCR試作を作る | 画像を送信せず11桁番号と票種候補を取得できる |
 | G1-009 | TODO | Builder Agent | Googleアカウント取得を検証する | 同一ドメイン利用者のメールを取得できるか記録される |
 | G1-010 | TODO | Builder Agent | 実験用シートへ1件登録する | 入力検証後にテスト行が追加される |
 | G1-011 | TODO | Builder Agent | 初回・2枚目以降の時間を測定する | 3秒目標との比較が記録される |
